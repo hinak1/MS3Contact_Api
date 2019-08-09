@@ -1,0 +1,5 @@
+Flask
+Flask-MySQL
+flask_restful
+flask_swagger_ui
+python-dotenv
