@@ -1,5 +1,5 @@
+#imports
 import os, sys
-sys.path.append(os.path.dirname(__file__))
 import json
 import datetime
 from flask import jsonify
@@ -8,50 +8,50 @@ from flask_restful import Resource, Api
 from flask_swagger_ui import get_swaggerui_blueprint
 from flaskext.mysql import MySQL
 from dotenv import load_dotenv
+import json
+#from assertions import assert_valid_schema
 
+sys.path.append(os.path.dirname(__file__))
 load_dotenv()
-
+###initialization
 app = Flask(__name__)
 api = Api(app, prefix="/api/v1")
-
 mysql = MySQL()
-
-# MySQL configurations
+### MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = os.getenv("MYSQL_DATABASE_USER")
 app.config['MYSQL_DATABASE_PASSWORD'] = os.getenv("MYSQL_DATABASE_PASSWORD")
 app.config['MYSQL_DATABASE_DB'] = os.getenv("MYSQL_DATABASE_DB")
 app.config['MYSQL_DATABASE_HOST'] = os.getenv("MYSQL_DATABASE_HOST")
 app.config['PORT'] = os.getenv("MYSQL_PORT")
 mysql.init_app(app)
-
-
+### swagger specific
 @app.route('/schema/<path:path>')
 def send_static(path):
     return send_from_directory('schema', path)
-### swagger specific ###
-SWAGGER_URL = '/api/v1/swagger'
-API_URL = '/schema/swagger.json'
-SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
+
+swagger_url = '/api/v1/swagger'
+api_url = '/schema/swagger.json'
+swaggerui_blueprint = get_swaggerui_blueprint(
+    swagger_url,
+    api_url,
     config={
         'app_name': "Contact_API_Code_Challenge"
     }
 )
-app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
-### end swagger specific ###
-#app.register_blueprint(request_api.get_blueprint())
+app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
 
+###About app.py###
+        # 1 Operations: POST / GET / PUT / PATCH / DELETE
+        # 2 Delete operation updates the status in DB (Soft Delete). Changes del_flag from false(default) to true
+        # 3 All db queries work on active data only. All data with condition ‘del_flag = true’ is ignored
+        # 4 By default when a new record is created in database. del_flag is set to False
+        # 5 PUT and PATCH operation do not allow updating the primary fields(first_name, last_name, dob and gender)
+        # 6 Have not addressed Authentication, Security, Validation and Logging in this version of API
+        #7  This version does not handle transaction roll backs 
 
-# 1 Operations: POST / GET / PUT / PATCH / DELETE
-# 2 Delete operation just updates the status in DB (Soft Delete).
-# 3 All queries involving the active flow (GET / PUT / PATCH)  will ignore all such entries with the condition ‘del_flag = true’
-# 4 By default when a new record is created in database. del_flag is set to False
-# 5 PUT and PATCH operation do not allow updating the primary fields(first_name, last_name, dob and gender)
-
-#This class holds the functions for adding and retreiving Contact Collections. Input body is expected to be an arry
+#This class holds the functions for adding and retreiving Contact Collections. Input body is expected to be an array
 class Contact_Collection(Resource):
-    #This function adds Contact identifocation information in Identification table, gets the id and adds cmmunication and address information against that identification id.
+    #This function adds Contact identification information in Identification table, gets the id and adds communication and address information against that identification id.
     def post(self):
         try:
             sql1 = "INSERT INTO identification (first_name, last_name, dob, gender, title) VALUES (%s, %s, %s, %s, %s)"
@@ -61,6 +61,9 @@ class Contact_Collection(Resource):
             sql5 = "INSERT INTO communication(identification_id, type, preferred, value)VALUES(%s, %s, %s, %s)"
 
             json_arr = request.json
+            json_data = json.loads(json_arr)
+
+            assert_valid_schema(json_data, 'swagger.json')
             for _json in json_arr:
                 identification_data = (_json['Identification']['FirstName'], _json['Identification']['LastName'], _json['Identification']['DOB'], _json['Identification']['Gender'], _json['Identification']['Title'])
                 conn = mysql.connect()
@@ -118,6 +121,10 @@ class Contact_Collection(Resource):
     def get(self):
         try:
             #get identification details
+            json_arr = request.json
+            json_data = json.loads(json_arr)
+
+            assert_valid_schema(json_data, 'swagger.json')
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM identification WHERE del_flag=%s Limit "+request.args.get('limit'), "False")
@@ -170,6 +177,63 @@ class Contact_Collection(Resource):
 
 
 class Contact(Resource):
+    def post(self):
+        try:
+            sql1 = "INSERT INTO identification (first_name, last_name, dob, gender, title) VALUES (%s, %s, %s, %s, %s)"
+            sql2 = "SELECT id FROM address WHERE type = %s AND num = %s AND street = %s AND unit = %s AND city = %s AND state = %s AND zipcode = %s"
+            sql3 = "INSERT INTO address(type, num, street, unit, city, state, zipcode) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            sql4 = "INSERT INTO identification_address(identification_id, address_id) VALUES (%s, %s)"
+            sql5 = "INSERT INTO communication(identification_id, type, preferred, value)VALUES(%s, %s, %s, %s)"
+
+            _json = request.json
+            identification_data = (_json['Identification']['FirstName'], _json['Identification']['LastName'], _json['Identification']['DOB'], _json['Identification']['Gender'], _json['Identification']['Title'])
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            #insert indentification
+            cursor.execute(sql1, identification_data)
+            conn.commit()
+            #get identification id
+            identification_id = cursor.lastrowid
+            #insert addresses
+            for a in _json['Address']:
+                address_data = (a['type'], a['number'], a['street'], a['Unit'], a['City'], a['State'], a['zipcode'])
+                cursor.execute(sql2, address_data)
+                add_result = cursor.fetchall()
+                if len(add_result) > 0:
+                    address_id = add_result[0]
+                else:
+                    cursor.execute(sql3, address_data)
+                    conn.commit()
+                    #get address_id
+                    address_id = cursor.lastrowid
+                #insert identity_address
+                identity_address_data = (identification_id, address_id )
+                cursor.execute(sql4, identity_address_data)
+                conn.commit()
+
+
+            #insert communication
+            for c in _json['Communication']:
+                if 'preferred' in  c:
+                    preference = c['preferred']
+                else:
+                        preference = 'false'
+                communication_data = (identification_id, c['type'], preference, c['value'])
+                cursor.execute(sql5, communication_data)
+                conn.commit()
+            
+            resp = jsonify('Contact Added Succesfully')
+            resp.status_code = 200
+            return resp
+        except Exception as e:
+            print(e)
+            return internal_error(e)
+
+        finally:
+            cursor.close()
+            conn.close()
+
+
     def get(self):
         try:
             #get idnetification details

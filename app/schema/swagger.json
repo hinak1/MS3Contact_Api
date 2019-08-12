@@ -3,50 +3,57 @@
   "info": {
     "version": "1.0.0",
     "title": "Contact Management API",
-    "description": "Contact API"
+    "description": "MS3 Contact API"
   },
-  "basePath": "/api",
+  "host": "localhost:5000",
+  "basePath": "/api/v1",
+  "schemes": [
+    "http"
+  ],
   "paths": {
-    "/contact": {
+    "/contacts": {
       "post": {
-        "description": "Add a new Contact",
-        "operationId": "addContacts",
+        "summary": "Creates list of Contacts with given input array",
+        "description": "",
+        "operationId": "post",
         "parameters": [
           {
-            "name": "contact",
             "in": "body",
-            "description": "The Contact JSON you want to post",
+            "name": "body",
+            "description": "List of Contact object",
+            "required": true,
             "schema": {
-              "$ref": "#/definitions/Contact"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Contact"
+              }
             }
           }
         ],
         "responses": {
-          "201": {
-            "description": "Contact created successfully",
-            "schema": {
-              "$ref": "#/definitions/Contact"
-            }
-          },
           "500": {
-            "description": "An unexpected error occured.",
+            "description": "An unexpected error occured",
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          },
+          "default": {
+            "description": "successful operation"
           }
         }
       },
       "get": {
-        "description": "Returns all contacts from the system",
-        "operationId": "getContacts",
+        "summary": "Returns all contacts with Active status",
+        "operationId": "get",
         "parameters": [
           {
             "name": "limit",
             "in": "query",
             "description": "maximum number of results to return",
-            "required": false,
+            "required": true,
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "default": 2
           }
         ],
         "responses": {
@@ -59,10 +66,37 @@
         }
       }
     },
-    "/contacts": {
+    "/contact": {
+      "post": {
+        "summary": "Creates a contact",
+        "description": "",
+        "operationId": "post_contact",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Creates a contact",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Contact"
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "An unexpected error occured",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      },
       "get": {
         "summary": "Gets a Contact",
-        "description": "Returns a single contact for its fname, lastname and email.",
+        "description": "Returns a single contact for its fname, lastname and dob.",
         "operationId": "getContact",
         "parameters": [
           {
@@ -70,27 +104,30 @@
             "in": "query",
             "required": true,
             "description": "The contact's fname",
-            "type": "string"
+            "type": "string",
+            "default": "Bob"
           },
           {
             "name": "lname",
             "in": "query",
             "required": true,
-            "description": "The contact's fname",
-            "type": "string"
+            "description": "The contact's lname",
+            "type": "string",
+            "default": "Fredrick"
           },
           {
             "name": "dob",
             "in": "query",
             "required": true,
-            "description": "The contact's fname",
+            "description": "The contact's dob",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "default": "1989-06-21"
           }
         ],
         "responses": {
           "200": {
-            "description": "A Contact",
+            "description": "Returns a single contact for its fname, lastname and dob",
             "schema": {
               "$ref": "#/definitions/Contact"
             }
@@ -107,34 +144,37 @@
         }
       },
       "put": {
-        "summary": "Update a Contact in the contact list",
+        "summary": "Updates a Contact and creates one if does not exist alreay",
         "description": "Update a Contact in the contact list",
         "operationId": "updateContact",
-        "parameters": [
+         "parameters": [
           {
             "name": "fname",
             "in": "query",
             "required": true,
             "description": "The contact's fname",
-            "type": "string"
+            "type": "string",
+            "default": "Bob"
           },
           {
             "name": "lname",
             "in": "query",
             "required": true,
-            "description": "The contact's fname",
-            "type": "string"
+            "description": "The contact's lname",
+            "type": "string",
+            "default": "Fredrick"
           },
           {
             "name": "dob",
             "in": "query",
             "required": true,
-            "description": "The contact's fname",
+            "description": "The contact's dob",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "default": "1989-06-21"
           },
           {
-            "name": "contact",
+            "name": "body",
             "in": "body",
             "schema": {
               "$ref": "#/definitions/Contact"
@@ -148,7 +188,7 @@
         }
       },
       "patch": {
-        "summary": "Update partially",
+        "summary": "Updates a contact partially",
         "description": "support partial updates for contact",
         "operationId": "patchContact",
         "parameters": [
@@ -157,14 +197,16 @@
             "in": "query",
             "required": true,
             "description": "The contact's fname",
-            "type": "string"
+            "type": "string",
+            "default": "Bob"
           },
           {
             "name": "lname",
             "in": "query",
             "required": true,
             "description": "The contact's lname",
-            "type": "string"
+            "type": "string",
+            "default": "Fredrick"
           },
           {
             "name": "dob",
@@ -172,10 +214,11 @@
             "required": true,
             "description": "The contact's dob",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "default": "1989-06-21"
           },
           {
-            "name": "contact",
+            "name": "body",
             "in": "body",
             "schema": {
               "$ref": "#/definitions/PatchArr"
@@ -189,23 +232,25 @@
         }
       },
       "delete": {
-        "summary": "Delete a contact",
+        "summary": "Deletes a contact",
         "description": "Delete a contact",
         "operationId": "deleteContact",
-        "parameters": [
+         "parameters": [
           {
             "name": "fname",
             "in": "query",
             "required": true,
             "description": "The contact's fname",
-            "type": "string"
+            "type": "string",
+            "default": "Bob"
           },
           {
             "name": "lname",
             "in": "query",
             "required": true,
             "description": "The contact's lname",
-            "type": "string"
+            "type": "string",
+            "default": "Fredrick"
           },
           {
             "name": "dob",
@@ -213,12 +258,16 @@
             "required": true,
             "description": "The contact's dob",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "default": "1989-06-21"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully deleted a person from people list"
+            "description": "Successfully deleted contact"
+          },
+          "404": {
+            "description": "User not found"
           }
         }
       }
@@ -249,24 +298,19 @@
         "dob": {
           "type": "string",
           "format": "date",
-          "description": "Date of birth"
+          "description": "Date of birth",
+          "default": "1989-06-21"
         },
         "gender": {
           "type": "string",
           "enum": [
-            "Male",
-            "Female"
+            "M",
+            "F"
           ],
           "description": "Gender."
         },
         "title": {
           "type": "string",
-          "enum": [
-            "Mr",
-            "Mrs",
-            "Miss",
-            "Dr"
-          ],
           "description": "Courtesy Title."
         }
       }
@@ -365,14 +409,16 @@
               "add",
               "replace"
             ],
+            "example": "remove",
             "description": "Allowed operations are add , remove , replace"
           },
           "path": {
             "type": "string",
-            "description": "Path of the field to be updated"
+            "description": "Path of the field to be updated",
+            "example": "/Identification/Title"
           },
           "value": {
-            "type": "string",
+            "type": "object",
             "description": "New value"
           }
         }
