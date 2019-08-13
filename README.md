@@ -10,11 +10,11 @@ Python 3.5.2+
 pip3
 refer to requirements.txt for list of modules to be installed
 ## Usage
-To run the server, execute the following from the root directory:
+To run the server, execute the following from the root directory of this application:
 ```
 pip3 install -r requirements.txt
 cd app
-python app.py
+python3 app.py
 ```
 
 and open your browser to here:
