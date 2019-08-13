@@ -6,15 +6,15 @@ Python Rest API. Supports full CRUD operations and also incremental updates.
 This server was written by Hina Kanwal for MS3. This server supports Full CRUD operations and also incremental and full updates. 
 This server uses Python Flask Module. Includes Swagger / Open API  based documentation / client. Also includes postman test collection
 ## Requirements
-Python 3.5.2+</br>
-pip3</br>
+Python 3.5.2+
+pip3
 refer to requirements.txt for list of modules to be installed
 ## Usage
 To run the server, execute the following from the root directory:
 ```
-pip3 install -r requirements.txt</br>
-cd app </br>
-python app.py </br>
+pip3 install -r requirements.txt
+cd app
+python app.py
 ```
 
 and open your browser to here:
@@ -36,17 +36,10 @@ To run the server on a Docker container, please execute the following from the r
 
 ```bash
 # building the image
-<<<<<<< HEAD
 $ docker build -t docker-flask:latest .
 
 # starting up a container
 $ docker run --name flaskapp -v$PWD/app:/app -p5000:5000 docker-flask:latest
-=======
-docker build -t swagger_server .
-
-# starting up a container
-docker run -p 8080:8080 swagger_server
-
 ```
 # Testing
 Import the postman collection in postman client.
