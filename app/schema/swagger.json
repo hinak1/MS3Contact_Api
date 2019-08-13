@@ -89,6 +89,9 @@
               "$ref": "#/definitions/Error"
             }
           },
+          "200": {
+              "description": "Successfully updated contact"
+          },
           "default": {
             "description": "successful operation"
           }
@@ -105,7 +108,7 @@
             "required": true,
             "description": "The contact's fname",
             "type": "string",
-            "default": "Bob"
+            "default": "hina"
           },
           {
             "name": "lname",
@@ -113,7 +116,7 @@
             "required": true,
             "description": "The contact's lname",
             "type": "string",
-            "default": "Fredrick"
+            "default": "kanwal"
           },
           {
             "name": "dob",
@@ -122,7 +125,7 @@
             "description": "The contact's dob",
             "type": "string",
             "format": "date",
-            "default": "1989-06-21"
+            "default": "1989-05-01"
           }
         ],
         "responses": {
@@ -154,7 +157,7 @@
             "required": true,
             "description": "The contact's fname",
             "type": "string",
-            "default": "Bob"
+            "default": "Hina"
           },
           {
             "name": "lname",
@@ -162,7 +165,7 @@
             "required": true,
             "description": "The contact's lname",
             "type": "string",
-            "default": "Fredrick"
+            "default": "Kanwal"
           },
           {
             "name": "dob",
@@ -171,7 +174,7 @@
             "description": "The contact's dob",
             "type": "string",
             "format": "date",
-            "default": "1989-06-21"
+            "default": "1989-05-01"
           },
           {
             "name": "body",
@@ -198,7 +201,7 @@
             "required": true,
             "description": "The contact's fname",
             "type": "string",
-            "default": "Bob"
+            "default": "Hina"
           },
           {
             "name": "lname",
@@ -206,7 +209,7 @@
             "required": true,
             "description": "The contact's lname",
             "type": "string",
-            "default": "Fredrick"
+            "default": "Kanwal"
           },
           {
             "name": "dob",
@@ -215,7 +218,7 @@
             "description": "The contact's dob",
             "type": "string",
             "format": "date",
-            "default": "1989-06-21"
+            "default": "1989-05-01"
           },
           {
             "name": "body",
@@ -242,7 +245,7 @@
             "required": true,
             "description": "The contact's fname",
             "type": "string",
-            "default": "Bob"
+            "default": "Hina"
           },
           {
             "name": "lname",
@@ -250,7 +253,7 @@
             "required": true,
             "description": "The contact's lname",
             "type": "string",
-            "default": "Fredrick"
+            "default": "Kanwal"
           },
           {
             "name": "dob",
@@ -259,7 +262,7 @@
             "description": "The contact's dob",
             "type": "string",
             "format": "date",
-            "default": "1989-06-21"
+            "default": "1989-05-01"
           }
         ],
         "responses": {
@@ -277,40 +280,41 @@
     "Identification": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "integer",
-          "description": "Unique identifier representing a specific Contact."
-        },
-        "first_name": {
+        "FirstName": {
           "type": "string",
+          "example": "Hina",
           "pattern": "[a-z0-9]{8,64}",
           "minLength": 8,
           "maxLength": 64,
           "description": "First Name."
         },
-        "last_name": {
+        "LastName": {
           "type": "string",
+          "example": "Kanwal",
           "pattern": "[a-z0-9]{8,64}",
           "minLength": 8,
           "maxLength": 64,
           "description": "Last Name."
         },
-        "dob": {
+        "DOB": {
           "type": "string",
           "format": "date",
+          "example": "1989-05-01",
           "description": "Date of birth",
-          "default": "1989-06-21"
+          "default": "1989-05-01"
         },
-        "gender": {
+        "Gender": {
           "type": "string",
+          "example": "F",
           "enum": [
             "M",
             "F"
           ],
           "description": "Gender."
         },
-        "title": {
+        "Title": {
           "type": "string",
+          "example": "Manager",
           "description": "Courtesy Title."
         }
       }
@@ -320,37 +324,40 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Unique identifier representing a specific Address."
-          },
           "type": {
             "type": "string",
-            "description": "address type e.g home,office"
+            "description": "address type e.g home,office",
+            "example": "home"
           },
           "number": {
             "type": "string",
-            "description": "house number"
+            "description": "house number",
+            "example": "6420"
           },
           "street": {
             "type": "string",
-            "description": "street address"
+            "description": "street address",
+            "example": "Cabell ct"
           },
-          "unit": {
+          "Unit": {
             "type": "string",
-            "description": "apartment / unit"
+            "description": "apartment / unit",
+            "example": ""
           },
-          "city": {
+          "City": {
             "type": "string",
-            "description": " City"
+            "description": " City",
+            "example": "Springfield"
           },
-          "state": {
+          "State": {
             "type": "string",
-            "description": "State"
+            "description": "State",
+            "example": "VA"
           },
           "zipcode": {
             "type": "string",
-            "description": "Zip Code"
+            "description": "Zip Code",
+            "example": "22150"
           }
         }
       }
@@ -360,17 +367,16 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Unique identifier representing a specific Comunication type."
-          },
           "type": {
             "type": "string",
-            "description": "Communication methode type e.g email, phone"
+            "description": "Communication methode type e.g email, phone",
+            "example": "email"
+
           },
           "value": {
             "type": "string",
-            "description": "Value of email adress  or phone number"
+            "description": "Value of email adress  or phone number",
+            "example": "hinaa.kanwal89@gmail.com"
           },
           "preferred": {
             "type": "string",
@@ -378,7 +384,8 @@
               true,
               false
             ],
-            "description": "Preferred Communication method"
+            "description": "Preferred Communication method",
+            "example": "true"
           }
         }
       }
@@ -415,7 +422,7 @@
           "path": {
             "type": "string",
             "description": "Path of the field to be updated",
-            "example": "/Identification/Title"
+            "example": "Identification/Title"
           },
           "value": {
             "type": "object",

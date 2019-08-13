@@ -8,15 +8,15 @@ from flask_restful import Resource, Api
 from flask_swagger_ui import get_swaggerui_blueprint
 from flaskext.mysql import MySQL
 from dotenv import load_dotenv
-import json
-#from assertions import assert_valid_schema
 
 sys.path.append(os.path.dirname(__file__))
 load_dotenv()
+
 ###initialization
 app = Flask(__name__)
 api = Api(app, prefix="/api/v1")
 mysql = MySQL()
+
 ### MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = os.getenv("MYSQL_DATABASE_USER")
 app.config['MYSQL_DATABASE_PASSWORD'] = os.getenv("MYSQL_DATABASE_PASSWORD")
@@ -24,6 +24,7 @@ app.config['MYSQL_DATABASE_DB'] = os.getenv("MYSQL_DATABASE_DB")
 app.config['MYSQL_DATABASE_HOST'] = os.getenv("MYSQL_DATABASE_HOST")
 app.config['PORT'] = os.getenv("MYSQL_PORT")
 mysql.init_app(app)
+
 ### swagger specific
 @app.route('/schema/<path:path>')
 def send_static(path):
@@ -40,7 +41,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 )
 app.register_blueprint(swaggerui_blueprint, url_prefix=swagger_url)
 
-###About app.py###
+###About app.py
         # 1 Operations: POST / GET / PUT / PATCH / DELETE
         # 2 Delete operation updates the status in DB (Soft Delete). Changes del_flag from false(default) to true
         # 3 All db queries work on active data only. All data with condition ‘del_flag = true’ is ignored
@@ -61,9 +62,6 @@ class Contact_Collection(Resource):
             sql5 = "INSERT INTO communication(identification_id, type, preferred, value)VALUES(%s, %s, %s, %s)"
 
             json_arr = request.json
-            json_data = json.loads(json_arr)
-
-            assert_valid_schema(json_data, 'swagger.json')
             for _json in json_arr:
                 identification_data = (_json['Identification']['FirstName'], _json['Identification']['LastName'], _json['Identification']['DOB'], _json['Identification']['Gender'], _json['Identification']['Title'])
                 conn = mysql.connect()
@@ -120,18 +118,13 @@ class Contact_Collection(Resource):
     #This function gets List of all Active Contactswith del_flag =  false) . Query parameter "limit" is used to limit the number of rows returned
     def get(self):
         try:
-            #get identification details
-            json_arr = request.json
-            json_data = json.loads(json_arr)
-
-            assert_valid_schema(json_data, 'swagger.json')
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM identification WHERE del_flag=%s Limit "+request.args.get('limit'), "False")
-            rows = cursor.fetchall()
-            if rows == None:
+            row_count = cursor.execute("SELECT * FROM identification WHERE del_flag=%s Limit "+request.args.get('limit'), "False")
+            if row_count < 1:
                 return not_found()
             else:
+                rows = cursor.fetchall()
                 contact_list = []
                 for identification_row in rows:
                     i = 0
@@ -506,7 +499,7 @@ api.add_resource(Contact, '/contact')
 def not_found(error=None):
     message = {
         'status': 404,
-        'message': 'Not Found: ' + request.url,
+        'message': 'No Data Found: ' + request.url,
     }
     resp = jsonify(message)
     resp.status_code = 404
@@ -524,4 +517,4 @@ def internal_error(e):
     return resp
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0')

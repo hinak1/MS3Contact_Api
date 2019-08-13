@@ -1,7 +1,7 @@
 # contact-api
 Python Rest API. Supports full CRUD operations and also incremental updates. 
 
-<<<<<<< HEAD
+
 ## Overview
 This server was written by Hina Kanwal for MS3. This server supports Full CRUD operations and also incremental and full updates. 
 This server uses Python Flask Module. Includes Swagger / Open API  based documentation / client. Also includes postman test collection
@@ -31,7 +31,7 @@ http://localhost:5000/api/v1/swagger/
 
 ## Running with Docker
 
->>>>>>> 445b7de85ae2bf2ac8f7c7e9bb25586a54a5b326
+
 To run the server on a Docker container, please execute the following from the root directory:
 
 ```bash
@@ -46,9 +46,9 @@ docker build -t swagger_server .
 
 # starting up a container
 docker run -p 8080:8080 swagger_server
->>>>>>> 445b7de85ae2bf2ac8f7c7e9bb25586a54a5b326
+
 ```
 # Testing
-Import the postman collection in postman client
+Import the postman collection in postman client.
 Postman collection file is placed in \MS3Contact_Api\PostmanTestCollection folder
-Test collection contains requests for all operations with default request params
+Test collection contains requests for all operations with default request parametres
